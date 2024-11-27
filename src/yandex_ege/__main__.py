@@ -114,7 +114,7 @@ def main(urls: Annotated[list[str], typer.Argument(help="Collection and/or task 
         if collection_match:
             collection_uuid = UUID(collection_match.group("uuid"))
             variant = get_variant(collection_uuid)
-            print(f"{variant.title} (https://education.yandex.ru/ege/collections/{variant.id})")
+            print(f"{variant.title} (https://education.yandex.ru/ege/collections/{variant.id}/task/1)")
             for i, task in enumerate(variant.tasks, start=1):
                 correct_answers = get_task_answer(task)
                 print(f"{i}. {correct_answers}")

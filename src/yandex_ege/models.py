@@ -44,7 +44,7 @@ class Task(Struct):
     id: UUID
     is_dialog_possible: bool
     markup: Markup
-    theory: list[Theory]
+    theory: list[Theory] | None
     number: int
     outdated: bool
     task_source_link: str | None
@@ -59,7 +59,7 @@ class TaskInfo(Struct):
     number: int
     outdated: bool
     tested_skill: str
-    theory: list[Theory]
+    theory: list[Theory] | None
     year: int
 
 
