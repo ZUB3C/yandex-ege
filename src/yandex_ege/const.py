@@ -11,5 +11,5 @@ DEFAULT_HEADERS = {
 TIMEOUT = 10
 YANDEX_EDUCATION_DOMAIN = "education.yandex.ru"
 UUID_REGEX = r"[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}"
-COLLECTIONS_PATTERN = re.compile(r"/ege/collections/(?P<uuid>(" + UUID_REGEX + r"))(/task/\d+)")
-TASK_PATTERN = re.compile(r"/ege/task/(?P<uuid>(" + UUID_REGEX + "))")
+COLLECTIONS_PATTERN = re.compile(r"^/ege/collections/(?P<uuid>(" + UUID_REGEX + r"))(/task/\d+)")
+TASK_PATTERN = re.compile(r"^/ege/task/(?P<uuid>(" + UUID_REGEX + "))")
