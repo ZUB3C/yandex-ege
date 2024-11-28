@@ -10,8 +10,8 @@ from yarl import URL
 from .const import (
     COLLECTIONS_PATTERN,
     DEFAULT_HEADERS,
+    DEFAULT_TIMEOUT,
     TASK_PATTERN,
-    TIMEOUT,
     YANDEX_EDUCATION_DOMAIN,
     auth_cookies,
 )
@@ -20,7 +20,7 @@ from .models import Task, Variant
 
 def get_crsf_token() -> str:
     data = requests.get(
-        "https://education.yandex.ru/api/v5/get-csrf-token", timeout=TIMEOUT
+        "https://education.yandex.ru/api/v5/get-csrf-token", timeout=DEFAULT_TIMEOUT
     ).json()
     return data["sk"].split(":")[0]
 
@@ -39,7 +39,7 @@ def get_variant(variant_id: UUID) -> Variant:
         },
     ]
     response = ANONYMOUS_SESSION.post(
-        "https://education.yandex.ru/api/v5/gpttr", json=payload, timeout=TIMEOUT
+        "https://education.yandex.ru/api/v5/gpttr", json=payload, timeout=DEFAULT_TIMEOUT
     )
     return msgspec.json.decode(response.text, type=Variant)
 
@@ -56,7 +56,7 @@ def get_task(task_id: UUID) -> Task:
         "https://education.yandex.ru/api/v5/gpttr",
         cookies={},
         json=json_data,
-        timeout=TIMEOUT,
+        timeout=DEFAULT_TIMEOUT,
     )
     return msgspec.json.decode(response.text, type=Task)
 
@@ -97,15 +97,41 @@ def submit_variant_answers(
         "https://education.yandex.ru/api/v5/gpttr",
         cookies=auth_cookies,
         json=json_data,
-        timeout=TIMEOUT,
+        timeout=DEFAULT_TIMEOUT,
     )
     return response.json()
 
 
 @app.command()
-def main(urls: Annotated[list[str], typer.Argument(help="Collection and/or task urls.")]):
+def main(
+    urls: Annotated[list[str], typer.Argument(help="Collection and/or task urls.")],
+    timeout: Annotated[
+        int,
+        typer.Option(
+            help="Request timeout in seconds.",
+        ),  # default=DEFAULT_TIMEOUT)
+    ] = DEFAULT_TIMEOUT,
+    global_heading: Annotated[
+        bool,
+        typer.Option(help="Print global heading before all answers.", is_flag=True),
+    ] = False,
+    redirects: Annotated[
+        bool,
+        typer.Option(
+            help=f"Allow links which redirects to {YANDEX_EDUCATION_DOMAIN}", is_flag=True
+        ),
+    ] = True,
+):
+    global ANONYMOUS_SESSION
+    ANONYMOUS_SESSION.timeout = timeout
+
     urls: list[URL] = list(map(URL, urls))
-    print("Ответы на задания и варианты:")
+    if redirects:
+        urls = [URL(ANONYMOUS_SESSION.get(i).url) for i in urls]
+
+    if global_heading:
+        print("Ответы на задания и варианты:")
+
     for i, url in enumerate(urls):
         if url.host != YANDEX_EDUCATION_DOMAIN:
             print(f"Invalid domain for url {url!s}, skipping it.\n")
@@ -114,7 +140,9 @@ def main(urls: Annotated[list[str], typer.Argument(help="Collection and/or task 
         if collection_match:
             collection_uuid = UUID(collection_match.group("uuid"))
             variant = get_variant(collection_uuid)
-            print(f"{variant.title} (https://education.yandex.ru/ege/collections/{variant.id}/task/1)")
+            print(
+                f"{variant.title} (https://education.yandex.ru/ege/collections/{variant.id}/task/1)"
+            )
             for i, task in enumerate(variant.tasks, start=1):
                 correct_answers = get_task_answer(task)
                 print(f"{i}. {correct_answers}")
