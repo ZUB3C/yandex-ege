@@ -18,8 +18,21 @@ pipx install git+https://github.com/ZUB3C/yandex-ege.git
 
 ## Usage
 
-```sh
-yandex-ege [OPTIONS] URLS..
+```text
+Usage: yandex-ege [OPTIONS] URLS...
+
+
+╭─ Arguments ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ *    urls      URLS...  Collection and/or task urls. [default: None] [required]                                                                            │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --timeout                                      INTEGER  Request timeout in seconds. [default: 10]                                                          │
+│ --global-heading        --no-global-heading             Print global heading before all answers. [default: no-global-heading]                              │
+│ --redirects             --no-redirects                  Allow links which redirects to education.yandex.ru [default: redirects]                            │
+│ --install-completion                                    Install completion for the current shell.                                                          │
+│ --show-completion                                       Show completion for the current shell, to copy it or customize the installation.                   │
+│ --help                                                  Show this message and exit.                                                                        │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
 ### Usage example
